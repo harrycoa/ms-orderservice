@@ -4,10 +4,14 @@ import com.pe.appventas.msorderservice.client.CustomerServiceClient;
 import com.pe.appventas.msorderservice.dto.AccountDto;
 import com.pe.appventas.msorderservice.dto.OrderRequest;
 import com.pe.appventas.msorderservice.entities.Order;
+import com.pe.appventas.msorderservice.exception.AccountNotFoundException;
+import com.pe.appventas.msorderservice.util.ExceptionMessagesEnum;
+import com.pe.appventas.msorderservice.util.OrderValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.channels.AcceptPendingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,21 +25,12 @@ public class OrderService {
 
     public Order createOrder(OrderRequest orderRequest){
 
-        AccountDto account = customerClient.findAccountById(orderRequest.getAccountId());
-
-        AccountDto dummyAccount = customerClient.createDummyAccount();
-        //dummyAccount = customerClient.createAccount(dummyAccount);
-
-        dummyAccount = customerClient.createAccountBody(dummyAccount);
-        dummyAccount.getAddress().setZipCode("987987");
-
-        customerClient.updateAccount(dummyAccount);
-
-        AccountDto updatedAccount = customerClient.findAccountById(orderRequest.getAccountId());
-        log.info(updatedAccount.toString());
+        // Validamos la excepcion de order
+        OrderValidator.validateOrder(orderRequest);
+        AccountDto account = customerClient.findAccountById(orderRequest.getAccountId())
+                                                                        .orElseThrow(()-> new AccountNotFoundException(ExceptionMessagesEnum.ACCOUNT_NOT_FOUND.getValue()));
 
 
-        customerClient.deleteAccount(dummyAccount);
 
         Order order = new Order();
         order.setAccountId(orderRequest.getAccountId());

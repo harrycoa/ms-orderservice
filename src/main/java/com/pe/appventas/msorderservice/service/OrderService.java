@@ -15,10 +15,13 @@ import com.pe.appventas.msorderservice.util.OrderValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 
-import java.util.ArrayList;
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -59,18 +62,14 @@ public class OrderService {
 
     }
     // necesita un contexto transaccional
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public Order createOrder(OrderRequest orderRequest){
-
         // Validamos la excepcion de order
         OrderValidator.validateOrder(orderRequest);
         AccountDto account = customerClient.findAccountById(orderRequest.getAccountId())
                                                                         .orElseThrow(()-> new AccountNotFoundException(ExceptionMessagesEnum.ACCOUNT_NOT_FOUND.getValue()));
-
-
         Order newOrder = initOrder(orderRequest);
         return orderDAO.save(newOrder);
-
     }
 
     public List<Order> findAllOrder(){

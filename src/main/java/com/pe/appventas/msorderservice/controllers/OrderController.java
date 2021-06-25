@@ -33,8 +33,15 @@ public class OrderController {
 
     @ApiOperation(value = "Lista el pedido (orders)  que se ha buscado por id", notes="Esta operacion retorna el pedido buscado por id")
     @GetMapping(value = "order/{orderId}")
-    public ResponseEntity<OrderResponse> findById(@PathVariable String orderId) {
+    public ResponseEntity<OrderResponse> findByOrderId(@PathVariable String orderId) {
         Order order = orderService.findOrderById(orderId);
+        return new ResponseEntity<>(converter.convertEntityToDto(order), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Lista el pedido (orders)  que se ha buscado por id", notes="Esta operacion retorna el pedido buscado por id")
+    @GetMapping(value = "order/generated/{id}")
+    public ResponseEntity<OrderResponse> findById(@PathVariable Long id) {
+        Order order = orderService.findById(id);
         return new ResponseEntity<>(converter.convertEntityToDto(order), HttpStatus.OK);
     }
 

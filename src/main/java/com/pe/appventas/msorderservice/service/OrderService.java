@@ -1,20 +1,28 @@
 package com.pe.appventas.msorderservice.service;
 
 import com.pe.appventas.msorderservice.client.CustomerServiceClient;
+import com.pe.appventas.msorderservice.dao.JpaOrderDAO;
 import com.pe.appventas.msorderservice.dto.AccountDto;
 import com.pe.appventas.msorderservice.dto.OrderRequest;
 import com.pe.appventas.msorderservice.entities.Order;
+import com.pe.appventas.msorderservice.entities.OrderDetail;
 import com.pe.appventas.msorderservice.exception.AccountNotFoundException;
+import com.pe.appventas.msorderservice.exception.OrderNotFoundException;
+import com.pe.appventas.msorderservice.util.Constants;
 import com.pe.appventas.msorderservice.util.ExceptionMessagesEnum;
+import com.pe.appventas.msorderservice.util.OrderStatus;
 import com.pe.appventas.msorderservice.util.OrderValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.channels.AcceptPendingException;
+
 import java.util.ArrayList;
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -23,6 +31,35 @@ public class OrderService {
     @Autowired
     private CustomerServiceClient customerClient;
 
+    @Autowired
+    private JpaOrderDAO orderDAO;
+
+
+    private Order initOrder(OrderRequest orderRequest){
+        Order orderObj = new Order();
+        orderObj.setOrderId(UUID.randomUUID().toString());
+        orderObj.setAccountId(orderRequest.getAccountId());
+        orderObj.setStatus(OrderStatus.PENDING);
+
+        // lista de orderdetail
+        List<OrderDetail> orderDetails = orderRequest.getItems().stream()
+                .map(item -> OrderDetail.builder()
+                        .price(item.getPrice())
+                        .quantity(item.getQuantity())
+                        .upc(item.getUpc())
+                        .igv((item.getPrice() * item.getQuantity()) * Constants.IGV_IMPORT)
+                        .order(orderObj).build())
+                .collect(Collectors.toList());
+
+        orderObj.setDetails(orderDetails);
+        orderObj.setTotalAmount(orderDetails.stream().mapToDouble(OrderDetail::getPrice).sum());
+        orderObj.setTotalIgv(orderObj.getTotalAmount() * Constants.IGV_IMPORT);
+        orderObj.setTransactionDate(new Date());
+        return orderObj;
+
+    }
+    // necesita un contexto transaccional
+    @Transactional
     public Order createOrder(OrderRequest orderRequest){
 
         // Validamos la excepcion de order
@@ -31,51 +68,24 @@ public class OrderService {
                                                                         .orElseThrow(()-> new AccountNotFoundException(ExceptionMessagesEnum.ACCOUNT_NOT_FOUND.getValue()));
 
 
+        Order newOrder = initOrder(orderRequest);
+        return orderDAO.save(newOrder);
 
-        Order order = new Order();
-        order.setAccountId(orderRequest.getAccountId());
-        order.setOrderId("100");
-        order.setStatus("PENDING");
-        order.setTotalAmount(1000.00);
-        order.setTotalIgv(10.00);
-        order.setTransactionDate(new Date());
-        return order;
     }
 
     public List<Order> findAllOrder(){
-        List<Order> orderList = new ArrayList();
-        Order order = new Order();
-        order.setAccountId("00001");
-        order.setOrderId("100");
-        order.setStatus("PENDING");
-        order.setTotalAmount(1000.00);
-        order.setTotalIgv(10.00);
-        order.setTransactionDate(new Date());
+        return orderDAO.findAll();
 
-        Order order2 = new Order();
-        order2.setAccountId("00001");
-        order2.setOrderId("100");
-        order2.setStatus("PENDING");
-        order2.setTotalAmount(1000.00);
-        order2.setTotalIgv(10.00);
-        order2.setTransactionDate(new Date());
-
-
-        orderList.add(order);
-        orderList.add(order2);
-
-        return orderList;
     }
 
     public Order findOrderById(String orderId){
-        Order order3 = new Order();
-        order3.setAccountId("00001");
-        order3.setOrderId("100");
-        order3.setStatus("PENDING");
-        order3.setTotalAmount(1000.00);
-        order3.setTotalIgv(10.00);
-        order3.setTransactionDate(new Date());
-
-        return order3;
+        return orderDAO.findByOrderId(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order no encontrada"));
     }
+
+    public Order findById(Long id){
+        return orderDAO.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order no encontrada"));
+    }
+
 }

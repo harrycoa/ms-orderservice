@@ -12,7 +12,7 @@ public class LineItem {
     private String upc;
 
     @ApiModelProperty(notes = "Cantidad", example = "2", required = true, position = 1)
-    private String  quantity;
+    private Integer  quantity;
 
     @ApiModelProperty(notes = "Precio", example = "17.88", required = true, position = 2)
     private Double price;

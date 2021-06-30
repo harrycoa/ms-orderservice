@@ -1,6 +1,5 @@
 package com.pe.appventas.msorderservice.entities;
 import lombok.*;
-
 import javax.persistence.*;
 
 @Getter
@@ -10,7 +9,7 @@ import javax.persistence.*;
 @Builder
 @Table(name = "ORDER_DETAILS")
 @Entity
-public class OrderDetail {
+public class OrderDetail extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +25,9 @@ public class OrderDetail {
 
     @Column(name = "UPC")
     private String upc;
+
+    @Column(name = "TOTAL_AMOUNT")
+    private Double totalAmount;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Order order;

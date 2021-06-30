@@ -3,6 +3,7 @@ package com.pe.appventas.msorderservice.handler;
 import com.pe.appventas.msorderservice.exception.AccountNotFoundException;
 import com.pe.appventas.msorderservice.exception.IncorrectOrderRequestException;
 import com.pe.appventas.msorderservice.exception.OrderServiceExceptionResponse;
+import com.pe.appventas.msorderservice.exception.PaymentNotAcceptedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -30,6 +31,12 @@ public class OrderServiceExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<Object> handleResourceNotFound(AccountNotFoundException exception, WebRequest request) {
+        OrderServiceExceptionResponse response = new OrderServiceExceptionResponse(exception.getMessage(), request.getDescription(false), HttpStatus.NOT_FOUND, LocalDateTime.now());
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @ExceptionHandler(PaymentNotAcceptedException.class)
+    public ResponseEntity<Object> handlePaymentNotAcceptedResourceNotFound(PaymentNotAcceptedException exception, WebRequest request) {
         OrderServiceExceptionResponse response = new OrderServiceExceptionResponse(exception.getMessage(), request.getDescription(false), HttpStatus.NOT_FOUND, LocalDateTime.now());
         return new ResponseEntity<>(response, response.getStatus());
     }

@@ -1,5 +1,6 @@
 package com.pe.appventas.msorderservice.entities;
 
+import com.pe.appventas.msorderservice.util.OrderPaymentStatus;
 import com.pe.appventas.msorderservice.util.OrderStatus;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import java.util.List;
 @Data
 @Table(name = "ORDERS")
 @Entity
-public class Order {
+public class Order extends CommonEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +33,13 @@ public class Order {
 
     @Column(name = "TOTAL_IGV")
     private Double totalIgv;
+
+    @Column(name = "TOTAL_AMOUNT_IGV")
+    private Double totalAmountIgv;
+
+    @Column(name = "PAYMENT_STATUS")
+    @Enumerated(value = EnumType.STRING)
+    private OrderPaymentStatus paymentStatus;
 
     @Column(name = "TRANSACTION_DATE")
     @Temporal(TemporalType.TIMESTAMP)

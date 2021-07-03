@@ -1,6 +1,7 @@
 package com.pe.appventas.msorderservice.service;
 
 import com.pe.appventas.msorderservice.client.CustomerServiceClient;
+import com.pe.appventas.msorderservice.client.InventoryServiceClient;
 import com.pe.appventas.msorderservice.dao.JpaOrderDAO;
 import com.pe.appventas.msorderservice.dto.AccountDto;
 import com.pe.appventas.msorderservice.dto.Confirmation;
@@ -42,6 +43,9 @@ public class OrderService {
     @Autowired
     private PaymentProcessorService paymentService;
 
+    @Autowired
+    private InventoryServiceClient inventoryServiceClient;
+
 
     // necesita un contexto transaccional
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -65,6 +69,8 @@ public class OrderService {
             throw new PaymentNotAcceptedException("El Pago  de su cuenta no fue aceptado, por favor verifique.");
         }
 
+        log.info("Actualizamos el inventario: {}", orderRequest.getItems());
+        inventoryServiceClient.updateInventory(orderRequest.getItems());
         return orderRepository.save(newOrder);
     }
 

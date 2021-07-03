@@ -6,11 +6,13 @@ import com.pe.appventas.msorderservice.dao.JpaOrderDAO;
 import com.pe.appventas.msorderservice.dto.AccountDto;
 import com.pe.appventas.msorderservice.dto.Confirmation;
 import com.pe.appventas.msorderservice.dto.OrderRequest;
+import com.pe.appventas.msorderservice.dto.ShipmentOrderResponse;
 import com.pe.appventas.msorderservice.entities.Order;
 import com.pe.appventas.msorderservice.entities.OrderDetail;
 import com.pe.appventas.msorderservice.exception.AccountNotFoundException;
 import com.pe.appventas.msorderservice.exception.OrderNotFoundException;
 import com.pe.appventas.msorderservice.exception.PaymentNotAcceptedException;
+import com.pe.appventas.msorderservice.producer.ShippingOrderProducer;
 import com.pe.appventas.msorderservice.repositories.OrderRepository;
 import com.pe.appventas.msorderservice.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,9 @@ public class OrderService {
     @Autowired
     private InventoryServiceClient inventoryServiceClient;
 
+    @Autowired
+    private ShippingOrderProducer shippingMessageProducer;
+
 
     // necesita un contexto transaccional
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -71,6 +76,10 @@ public class OrderService {
 
         log.info("Actualizamos el inventario: {}", orderRequest.getItems());
         inventoryServiceClient.updateInventory(orderRequest.getItems());
+
+        log.info("Enviamos el request al ShippingService", orderRequest.getItems());
+        shippingMessageProducer.send(newOrder.getOrderId(), account);
+
         return orderRepository.save(newOrder);
     }
 
@@ -119,6 +128,18 @@ public class OrderService {
         Optional<List<Order>> orders = Optional.ofNullable(orderRepository.findOrderByAccountId(accountId));
         return orders
                 .orElseThrow(() -> new OrderNotFoundException("Orders no fueron encontradas"));
+    }
+
+    public void updateShipmentOrder(ShipmentOrderResponse response){
+        try {
+            Order order = findOrderById(response.getOrderId());
+            order.setStatus(OrderStatus.valueOf(response.getShippingStatus()));
+            orderRepository.save(order);
+        } catch (OrderNotFoundException orderNotFound) {
+            log.info(" el siguiente pedido no fue encontrado: {} con el tracking : {}", response.getOrderId(), response.getTrackingId());
+        }  catch (Exception e) {
+            log.info("Ocurrio un error");
+        }
     }
 
 }

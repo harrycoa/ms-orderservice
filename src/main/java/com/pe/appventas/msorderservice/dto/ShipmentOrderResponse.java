@@ -1,16 +1,16 @@
 package com.pe.appventas.msorderservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShipmentOrderResponse {
+@ToString
+public class ShipmentOrderResponse implements Serializable {
     @JsonProperty("orderId")
     private String orderId;
 

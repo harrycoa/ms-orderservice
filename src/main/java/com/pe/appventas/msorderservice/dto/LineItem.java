@@ -2,9 +2,11 @@ package com.pe.appventas.msorderservice.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 @ApiModel(description = "Clase que representa un item incluido  en el pedido")
 public class LineItem {
 

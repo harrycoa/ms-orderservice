@@ -51,6 +51,9 @@ public class OrderService {
     @Autowired
     private ShippingOrderProducer shippingMessageProducer;
 
+    @Autowired
+    private OrderMailService orderMailService;
+
 
     // necesita un contexto transaccional
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -79,6 +82,8 @@ public class OrderService {
 
         log.info("Enviamos el request al ShippingService", orderRequest.getItems());
         shippingMessageProducer.send(newOrder.getOrderId(), account);
+
+        log.info("Exito =======================>");
 
         return orderRepository.save(newOrder);
     }
@@ -135,10 +140,11 @@ public class OrderService {
             Order order = findOrderById(response.getOrderId());
             order.setStatus(OrderStatus.valueOf(response.getShippingStatus()));
             orderRepository.save(order);
+            orderMailService.sendEmail(order, response);
         } catch (OrderNotFoundException orderNotFound) {
             log.info(" el siguiente pedido no fue encontrado: {} con el tracking : {}", response.getOrderId(), response.getTrackingId());
         }  catch (Exception e) {
-            log.info("Ocurrio un error");
+            log.info("Ocurrio un error enviando el correo: " + e.getMessage());
         }
     }
 

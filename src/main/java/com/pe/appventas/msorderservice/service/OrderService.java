@@ -142,7 +142,7 @@ public class OrderService {
             orderRepository.save(order);
             orderMailService.sendEmail(order, response);
         } catch (OrderNotFoundException orderNotFound) {
-            log.info(" el siguiente pedido no fue encontrado: {} con el tracking : {}", response.getOrderId(), response.getTrackingId());
+            log.info("El siguiente pedido no fue encontrado: {} con el tracking : {}", response.getOrderId(), response.getTrackingId());
         }  catch (Exception e) {
             log.info("Ocurrio un error enviando el correo: " + e.getMessage());
         }

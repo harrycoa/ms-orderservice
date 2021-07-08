@@ -17,6 +17,7 @@ import com.pe.appventas.msorderservice.repositories.OrderRepository;
 import com.pe.appventas.msorderservice.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -115,7 +116,8 @@ public class OrderService {
     }
 
     // Spring Data
-    public List<Order> findAllOrder(){
+    @Cacheable(value = "orders")
+    public List<Order> findAllOrders(){
         return orderRepository.findAll();
 
     }
@@ -129,6 +131,8 @@ public class OrderService {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order no encontrada"));
     }
+
+    @Cacheable(value = "ordersAccount", key = "#accountId")
     public List<Order> findOrdersByAccountId(String accountId){
         Optional<List<Order>> orders = Optional.ofNullable(orderRepository.findOrderByAccountId(accountId));
         return orders

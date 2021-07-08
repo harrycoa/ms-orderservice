@@ -28,7 +28,7 @@ public class OrderController {
     @ApiOperation(value = "Lista los pedidos (orders) almacenados", notes="Esta operacion retorna  los pedidos almacenados")
     @GetMapping(value =  "order")
     public ResponseEntity<List<OrderResponse>> findAll(){
-        List<Order> orders = orderService.findAllOrder();
+        List<Order> orders = orderService.findAllOrders();
         return new ResponseEntity<>(converter.convertEntityToDto(orders), HttpStatus.OK);
     }
 

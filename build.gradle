@@ -33,7 +33,10 @@ dependencies {
 	compileOnly 'org.modelmapper:modelmapper:2.3.2'
 	compileOnly 'org.springframework.boot:spring-boot-starter-actuator:2.1.7.RELEASE'
 	compileOnly 'org.springframework.data:spring-data-rest-hal-browser:3.0.8.RELEASE'
-	compileOnly 'org.springframework.boot:spring-boot-devtools:2.1.7.RELEASE'
+	// compileOnly 'org.springframework.boot:spring-boot-devtools:2.1.7.RELEASE' se deshabilita porque ocasiona errores en el cacheo del redis
+	compileOnly 'org.springframework.boot:spring-boot-starter-cache:2.1.6.RELEASE'
+	compileOnly 'org.springframework.boot:spring-boot-starter-data-redis:2.1.6.RELEASE'
+	compileOnly("mysql:mysql-connector-java")
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

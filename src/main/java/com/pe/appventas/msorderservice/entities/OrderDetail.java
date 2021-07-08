@@ -1,6 +1,7 @@
 package com.pe.appventas.msorderservice.entities;
 import lombok.*;
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -9,7 +10,7 @@ import javax.persistence.*;
 @Builder
 @Table(name = "ORDER_DETAILS")
 @Entity
-public class OrderDetail extends CommonEntity{
+public class OrderDetail extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @Table(name = "ORDERS")
 @Entity
-public class Order extends CommonEntity{
+public class Order extends CommonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

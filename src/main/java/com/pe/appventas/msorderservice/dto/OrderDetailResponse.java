@@ -9,4 +9,5 @@ public class OrderDetailResponse {
     private double price;
     private double igv;
     private String upc;
+    private Double totalAmount;
 }

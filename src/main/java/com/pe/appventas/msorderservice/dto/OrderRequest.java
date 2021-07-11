@@ -4,13 +4,14 @@ package com.pe.appventas.msorderservice.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
-@Getter
+@Data
 @ApiModel(description = "Esta clase representa el proceso de pedidos")
 public class OrderRequest {
     @NotNull
